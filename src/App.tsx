@@ -1,26 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import NavBar from './navigation/NavBar'
+import ProjectNavigation from './navigation/ProjectNavigation'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { BottomNavigation, Box, Container, styled } from '@mui/material';
+import WelcomePage from './pages/welcome/WelcomePage';
+import SegmentationPage from './pages/segmentation/SegmentationPage';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
+enum NavigationPage {
+  Welcome = "welcome",
+  Segmentation = "segmentation",
+  Modelling = "modelling",
+  Measuring = "measuring"
+}
+
+function CurrentPage(props: { page: NavigationPage }) {
+  switch(props.page){
+    case NavigationPage.Welcome: return <WelcomePage />;
+    case NavigationPage.Segmentation: return <SegmentationPage />;
+    default: return <div>Error</div>;
+  }
+}
 
 function App() {
+  const [page, setPage] = useState<NavigationPage>(NavigationPage.Welcome);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <ThemeProvider theme={darkTheme}>
+      <Box height='100vh' sx={{ bgcolor: 'black', color: 'white' }}>
+        <CurrentPage page={page} />
+        {page !== NavigationPage.Welcome && <ProjectNavigation />}
+      </Box>
+    </ThemeProvider>
+  )
+
+  /*return (
+    <ThemeProvider theme={darkTheme}>
+      <LayoutContainer>
+      <ProjectNavigation />
+      </LayoutContainer>
+      
+    </ThemeProvider>
+      
+  );*/
 }
 
 export default App;
