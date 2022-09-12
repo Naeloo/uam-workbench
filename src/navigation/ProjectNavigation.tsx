@@ -6,21 +6,33 @@ import TimelineIcon from "@mui/icons-material/Timeline";
 import { useState } from "react";
 import Box from "@mui/material/Box";
 
-function ProjectNavigation() {
-    const [value, setValue] = useState(0);
+export enum NavigationPage {
+    Welcome = "welcome",
+    Segmentation = "segmentation",
+    Modelling = "modelling",
+    Measuring = "measuring"
+}
+
+interface ProjectNavigationProps {
+    onNav: (page: NavigationPage) => void
+}
+
+function ProjectNavigation(props: ProjectNavigationProps) {
+    const [value, setValue] = useState(NavigationPage.Segmentation);
 
     return (
-        <Box style={{ position: 'absolute', bottom: 0, width: '100%'}}>
+        <Box style={{ position: 'absolute', bottom: 0, width: '100%' }}>
             <BottomNavigation
                 showLabels
                 value={value}
                 onChange={(event, newValue) => {
                     setValue(newValue);
+                    props.onNav(newValue);
                 }}
             >
-                <BottomNavigationAction label="Segmentation" icon={<LayersIcon />} />
-                <BottomNavigationAction label="Modelling" icon={<ViewInArIcon />} />
-                <BottomNavigationAction label="Measuring" icon={<TimelineIcon />} />
+                <BottomNavigationAction label="Segmentation" value={NavigationPage.Segmentation} icon={<LayersIcon />} />
+                <BottomNavigationAction label="Modelling" value={NavigationPage.Modelling} icon={<ViewInArIcon />} />
+                <BottomNavigationAction label="Measuring" value={NavigationPage.Measuring} icon={<TimelineIcon />} />
             </BottomNavigation>
         </Box>
     );

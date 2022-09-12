@@ -1,43 +1,45 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import NavBar from './navigation/NavBar'
-import ProjectNavigation from './navigation/ProjectNavigation'
+import ProjectNavigation, { NavigationPage } from './navigation/ProjectNavigation'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { BottomNavigation, Box, Container, styled } from '@mui/material';
+import Box from '@mui/material/Box';
 import WelcomePage from './pages/welcome/WelcomePage';
 import SegmentationPage from './pages/segmentation/SegmentationPage';
+import { AirwayProject } from './project';
+import SettingsDialog from './settings/SettingsDialog';
+import SettingsButton from './settings/SettingsButton';
+import ModellingPage from './pages/modelling/ModellingPage';
+import MeasuringPage from './pages/measuring/MeasuringPage';
 
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: "#00649c"
+    }
   },
+  
 });
-
-enum NavigationPage {
-  Welcome = "welcome",
-  Segmentation = "segmentation",
-  Modelling = "modelling",
-  Measuring = "measuring"
-}
-
-function CurrentPage(props: { page: NavigationPage }) {
-  switch(props.page){
-    case NavigationPage.Welcome: return <WelcomePage />;
-    case NavigationPage.Segmentation: return <SegmentationPage />;
-    default: return <div>Error</div>;
-  }
-}
 
 function App() {
   const [page, setPage] = useState<NavigationPage>(NavigationPage.Welcome);
+  const [project, setProject] = useState<AirwayProject | null>(null);
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <ThemeProvider theme={darkTheme}>
       <Box height='100vh' sx={{ bgcolor: 'black', color: 'white' }}>
-        <CurrentPage page={page} />
-        {page !== NavigationPage.Welcome && <ProjectNavigation />}
+        {page === NavigationPage.Welcome && <WelcomePage onProject={prj => { setProject(prj); setPage(NavigationPage.Segmentation); }} />}
+
+        {page === NavigationPage.Segmentation && <SegmentationPage project={project as AirwayProject} />}
+        {page === NavigationPage.Modelling    && <ModellingPage project={project as AirwayProject} />}
+        {page === NavigationPage.Measuring    && <MeasuringPage project={project as AirwayProject} />}
+
+        {page !== NavigationPage.Welcome && <ProjectNavigation onNav={pg => setPage(pg)} />}
       </Box>
+      <SettingsButton onClick={() => setSettingsOpen(true)} />
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </ThemeProvider>
   )
 
