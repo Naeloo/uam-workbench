@@ -10,6 +10,7 @@ import SettingsDialog from './settings/SettingsDialog';
 import SettingsButton from './settings/SettingsButton';
 import ModellingPage from './pages/modelling/ModellingPage';
 import MeasuringPage from './pages/measuring/MeasuringPage';
+import { invoke } from '@tauri-apps/api/tauri'
 
 const darkTheme = createTheme({
   palette: {
@@ -20,6 +21,8 @@ const darkTheme = createTheme({
   },
   
 });
+
+invoke('get_settings').then((message) => console.log(message))
 
 function App() {
   const [page, setPage] = useState<NavigationPage>(NavigationPage.Welcome);
