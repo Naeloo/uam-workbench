@@ -5,20 +5,24 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { AirwayProject, DefaultAirwayProject } from "../../project";
+import { useState } from "react";
+import ProjectCreateDialog from "./ProjectCreateDialog";
 
 interface WelcomePageProps {
   onProject: (project: AirwayProject) => void
 }
 
 function WelcomePage(props: WelcomePageProps) {
+  const [createOpen, setCreateOpen] = useState(false);
+
   return (
     <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <h1>Welcome to UAM Workbench!</h1>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', marginBottom: '30px' }}>
-        <Button color="primary" variant="contained" onClick={() => props.onProject({ name: 'Dummy Project', path: '', ...DefaultAirwayProject })} endIcon={<AddBoxIcon />}>
+        <Button color="primary" variant="contained" onClick={() => setCreateOpen(true)} endIcon={<AddBoxIcon />}>
           New Project
         </Button>
-        <Button color="primary" variant="contained" onClick={() => props.onProject({ name: 'Dummy Project', path: '', ...DefaultAirwayProject })} endIcon={<AddBoxIcon />}>
+        <Button color="primary" variant="contained" onClick={() => props.onProject(DefaultAirwayProject)} endIcon={<AddBoxIcon />}>
           Load Project
         </Button>
       </div>
@@ -30,6 +34,7 @@ function WelcomePage(props: WelcomePageProps) {
           </ListItemButton>
         </List>
       </Paper>
+      <ProjectCreateDialog open={createOpen} onClose={() => setCreateOpen(false)} onProject={prj => props.onProject(prj)} />
     </div>
   )
 }

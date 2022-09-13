@@ -11,7 +11,9 @@ export interface AirwayMeasurementSetup {
     description: string
 }
 
-export const DefaultAirwayProject = {
+export const DefaultAirwayProject: AirwayProject = {
+    name: 'New Project',
+    path: '',
     measuring: {
         setups: []
     }
