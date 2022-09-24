@@ -22,7 +22,7 @@ function WelcomePage(props: WelcomePageProps) {
         <Button color="primary" variant="contained" onClick={() => setCreateOpen(true)} endIcon={<AddBoxIcon />}>
           New Project
         </Button>
-        <Button color="primary" variant="contained" onClick={() => props.onProject(DefaultAirwayProject)} endIcon={<AddBoxIcon />}>
+        <Button color="primary" variant="contained" onClick={() => props.onProject(DefaultAirwayProject as AirwayProject)} endIcon={<AddBoxIcon />}>
           Load Project
         </Button>
       </div>

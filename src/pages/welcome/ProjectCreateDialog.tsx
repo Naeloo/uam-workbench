@@ -9,18 +9,38 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { AirwayProject, DefaultAirwayProject } from "../../project";
 import { open } from '@tauri-apps/api/dialog';
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import { path } from "@tauri-apps/api";
+import { createProject } from "../../project/commands";
 
 function ProjectCreateDialog(props: { open: boolean; onClose: () => void, onProject: (prj: AirwayProject) => void; }) {
-    const [project, setProject] = React.useState<AirwayProject>(DefaultAirwayProject);
+    const [projectPaths, setProjectPaths] = React.useState<{ basePath: string, projectPath: string }>({ basePath: '', projectPath: ''});
+    const [project, setProject] = React.useState<Partial<AirwayProject>>(DefaultAirwayProject);
 
-    React.useEffect(() => { }, [project]);
-
-    const selectProjectFolder =  async () => {
+    // ===== PROJECT PATH STUFF =====
+    const folderize = (str: string) => str.toLowerCase().replace(/ /g, '-');
+    React.useEffect(() => {
+        path.join(projectPaths.basePath, project.name ? folderize(project.name) : '').then(newPath => {
+            setProjectPaths({
+                ...projectPaths,
+                projectPath: newPath
+            })
+        })
+    }, [project.name, projectPaths.basePath]);
+    const selectBasePath =  async () => {
         const folder = await open({
             directory: true
         });
-        if(typeof(folder) === "string") setProject({...project, path: folder});
+        if(typeof(folder) === "string") setProjectPaths({ ...projectPaths, basePath: folder });
     }
+
+    // ==== CALLBACKS ===
+    const onProjectCreate = async () => {
+        await createProject(project as AirwayProject, projectPaths.projectPath);
+    }
+
+    // ==== OTHER FORM STUFF =======
+    const isCreateable = () => projectPaths.basePath && project.name;
 
     return (
         <div>
@@ -41,22 +61,23 @@ function ProjectCreateDialog(props: { open: boolean; onClose: () => void, onProj
                             type="text"
                             fullWidth
                             variant="standard"
+                            value={project.name}
+                            onChange={e => setProject({ ...project, name: (e.target as HTMLInputElement).value })}
                         />
                         </Grid>
-                        <Grid item xs={4}>
-                            <Button variant="contained" onClick={() => selectProjectFolder()}>Select folder</Button>
-                        </Grid>
-                        <Grid item xs={8}>
-                            <TextField
+                        <Grid item xs={12}>
+                        <TextField
                             autoFocus
                             margin="dense"
                             id="path"
-                            label="Folder"
+                            label="Path"
                             type="text"
-                            disabled
+                            value={ projectPaths.basePath === '' ? "<Click to select path>" : projectPaths.projectPath }
                             fullWidth
                             variant="standard"
-                            value={project.path}
+                            disabled
+                            onClick={() => selectBasePath()}
+                            inputProps={{ style: { cursor: 'pointer' }}}
                         />
                         </Grid>
                     </Grid>
@@ -65,7 +86,7 @@ function ProjectCreateDialog(props: { open: boolean; onClose: () => void, onProj
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => props.onClose()}>Cancel</Button>
-                    <Button onClick={() => props.onProject(project)}>Create</Button>
+                    <Button onClick={() => onProjectCreate()} disabled={!isCreateable()}>Create</Button>
                 </DialogActions>
             </Dialog>
         </div>

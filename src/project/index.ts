@@ -1,6 +1,5 @@
 export interface AirwayProject {
     name: string,
-    path: string,
     measuring: {
         setups: AirwayMeasurementSetup[]
     }
@@ -11,9 +10,8 @@ export interface AirwayMeasurementSetup {
     description: string
 }
 
-export const DefaultAirwayProject: AirwayProject = {
+export const DefaultAirwayProject: Partial<AirwayProject> = {
     name: 'New Project',
-    path: '',
     measuring: {
         setups: []
     }
