@@ -19,19 +19,21 @@ fn main() {
   });*/
 
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![get_settings])
-    .invoke_handler(tauri::generate_handler![create_project])
+    .invoke_handler(tauri::generate_handler![get_settings, create_project, load_project])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
 
 #[tauri::command]
 fn get_settings() -> settings::WorkbenchSettings {
-  return settings::load().expect("Could not load settings upon JS request").into();
+  settings::load().expect("Could not load settings upon JS request").into()
 }
 
 #[tauri::command]
-fn create_project(project: project::AirwayProject, projectPath: String) -> bool {
-  project::create(project, projectPath).expect("Could not load settings upon JS request");
-  return true;
+fn create_project(project: project::AirwayProject, projectPath: String) -> Result<(), String> {
+  project::create(project, projectPath)
+}
+#[tauri::command]
+fn load_project(project_path: String) -> Result<project::AirwayProject, String> {
+  project::load(project_path)
 }

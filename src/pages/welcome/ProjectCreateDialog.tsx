@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { AirwayProject, DefaultAirwayProject } from "../../project";
-import { open } from '@tauri-apps/api/dialog';
+import * as dialog from '@tauri-apps/api/dialog';
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { path } from "@tauri-apps/api";
@@ -28,7 +28,7 @@ function ProjectCreateDialog(props: { open: boolean; onClose: () => void, onProj
         })
     }, [project.name, projectPaths.basePath]);
     const selectBasePath =  async () => {
-        const folder = await open({
+        const folder = await dialog.open({
             directory: true
         });
         if(typeof(folder) === "string") setProjectPaths({ ...projectPaths, basePath: folder });
@@ -36,7 +36,8 @@ function ProjectCreateDialog(props: { open: boolean; onClose: () => void, onProj
 
     // ==== CALLBACKS ===
     const onProjectCreate = async () => {
-        await createProject(project as AirwayProject, projectPaths.projectPath);
+        const createdProject = await createProject(project as AirwayProject, projectPaths.projectPath);
+        props.onProject(createdProject);
     }
 
     // ==== OTHER FORM STUFF =======

@@ -1,45 +1,41 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 use std::fs;
-use std::net::SocketAddr;
-use std::error::Error;
-use home;
 
 #[derive(Serialize, Deserialize)]
 pub struct AirwayProject {
     name: String
 }
 
-pub fn create(project: AirwayProject, path: String) -> Result<()> {
-    let mut airwayPath = PathBuf::from(&path);
+pub fn create(project: AirwayProject, path: String) -> Result<(), String> {
+    let mut project_path = PathBuf::from(&path);
     // Create the folder
     fs::create_dir_all(path).expect("Could not create project directory");
     // Build path to airway.json
-    airwayPath.extend(["airway.json"].iter());
+    project_path.extend(["airway.json"].iter());
     // Dump the airway.json in it
     let airway_str = serde_json::to_string(&project).expect("Could not serialize project file");
-    fs::write(airwayPath.to_str().expect("Could not write project file"), airway_str);
+    fs::write(project_path.to_str().expect("Could not write project file"), airway_str);
     Ok(())
 }
 
-/*
-pub fn load() -> Result<WorkbenchSettings> {
-    // Build the configuration path
-    let mut conf_dir = home::home_dir().expect("Could not determine home directory");
-    conf_dir.extend([".config", "uam-workbench", "settings.json"].iter());
-    // If the file is not found, save a default config
-    if !conf_dir.exists() {
-        save(default_settings());
+
+pub fn load(path: String) -> Result<AirwayProject, String> {
+    // Build the project path
+    let mut airway_path = PathBuf::from(&path);
+    airway_path.extend(["airway.json"].iter());
+    // If the file is not found, error out
+    if !airway_path.exists() {
+        return Err("Directory or airway.json not found".into());
     }
-    // Read the config file
-    let wb_settings_str = fs::read_to_string(conf_dir.to_str().expect("Failed to load configuration")).expect("Failed to load configuration");
-    let wb_settings: WorkbenchSettings = serde_json::from_str(&wb_settings_str).expect("Failed to parse configuration");
+    // Read the project file
+    let airway_project_str = fs::read_to_string(airway_path.to_str().expect("Failed to load project file")).expect("Failed to load project");
+    let airway_project: AirwayProject = serde_json::from_str(&airway_project_str).expect("Failed to parse airway.json");
     // Return the fruits of our labour
-    return Ok(wb_settings);
+    Ok(airway_project)
 }
 
-/* */
+/*
 pub fn save(wb_settings: WorkbenchSettings) -> Result<()> {
     // Build the config path
     let mut conf_dir = home::home_dir().expect("Could not determine home directory");

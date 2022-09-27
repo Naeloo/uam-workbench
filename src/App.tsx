@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import ProjectNavigation, { NavigationPage } from './navigation/ProjectNavigation'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -11,6 +11,7 @@ import SettingsButton from './settings/SettingsButton';
 import ModellingPage from './pages/modelling/ModellingPage';
 import MeasuringPage from './pages/measuring/MeasuringPage';
 import { invoke } from '@tauri-apps/api/tauri'
+import { appWindow } from '@tauri-apps/api/window';
 
 const darkTheme = createTheme({
   palette: {
@@ -29,6 +30,11 @@ function App() {
   const [project, setProject] = useState<AirwayProject | null>(null);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    if(!project) appWindow.setTitle("UAM Workbench");
+    else appWindow.setTitle(`UAM Workbench - ${project?.name}`);
+  }, [project]);
 
   return (
     <ThemeProvider theme={darkTheme}>
